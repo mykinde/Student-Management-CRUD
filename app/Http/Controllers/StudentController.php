@@ -7,10 +7,26 @@ use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
-    public function index()
+    public function index1()
     {
-        $students = Student::all();
-        return view('students.index', compact('students'));
+         $students = Student::all();
+         return view('students.index', compact('students'));
+    }
+
+     public function index(Request $request)
+    {
+        $search = $request->input('search');
+
+        $students = Student::query()
+            ->when($search, function ($query, $search) {
+                $query->where('first_name', 'like', '%' . $search . '%')
+                      ->orWhere('last_name', 'like', '%' . $search . '%')
+                      ->orWhere('email', 'like', '%' . $search . '%');
+            })
+            ->latest() // Order by latest created students
+            ->paginate(10); // Add pagination for better performance with many records
+
+        return view('students.index', compact('students', 'search'));
     }
 
     public function create()

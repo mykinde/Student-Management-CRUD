@@ -5,8 +5,40 @@
         </h2>
     </x-slot>
 
-    <div class="mb-4 text-right">
-        <a href="{{ route('grades.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+    <div class="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+        {{-- Search and Filter Form --}}
+        <form action="{{ route('grades.index') }}" method="GET" class="w-full md:w-auto flex flex-col md:flex-row items-stretch md:items-center space-y-2 md:space-y-0 md:space-x-2">
+            <x-text-input id="search" name="search" type="text" class="block w-full" placeholder="Search by student, course, or grade..." value="{{ $search }}" />
+
+            <select id="filter_course_id" name="filter_course_id" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm w-full md:w-auto">
+                <option value="">Filter by Course</option>
+                @foreach ($courses as $course)
+                    <option value="{{ $course->id }}" {{ $filterCourseId == $course->id ? 'selected' : '' }}>
+                        {{ $course->name }} ({{ $course->code }})
+                    </option>
+                @endforeach
+            </select>
+
+            <select id="filter_grade" name="filter_grade" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm w-full md:w-auto">
+                <option value="">Filter by Grade</option>
+                @foreach ($distinctGrades as $gradeOption)
+                    <option value="{{ $gradeOption }}" {{ $filterGrade == $gradeOption ? 'selected' : '' }}>
+                        {{ $gradeOption }}
+                    </option>
+                @endforeach
+            </select>
+
+            <x-primary-button type="submit">Apply</x-primary-button>
+
+            @if($search || $filterCourseId || $filterGrade)
+                <a href="{{ route('grades.index') }}" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 focus:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150 w-full md:w-auto justify-center">
+                    Clear Filters
+                </a>
+            @endif
+        </form>
+
+        {{-- Add New Grade Button --}}
+        <a href="{{ route('grades.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 mt-4 md:mt-0">
             Assign New Grade
         </a>
     </div>
@@ -33,7 +65,7 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                @foreach ($grades as $grade)
+                @forelse ($grades as $grade)
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                             {{ $grade->id }}
@@ -57,8 +89,18 @@
                             </form>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-center">
+                            No grades found.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
+    </div>
+
+    <div class="mt-4">
+        {{ $grades->appends(request()->except('page'))->links() }}
     </div>
 </x-app-layout>

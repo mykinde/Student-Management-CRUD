@@ -5,7 +5,16 @@
         </h2>
     </x-slot>
 
-    <div class="mb-4 text-right">
+    <div class="mb-4 flex justify-between items-center">
+        <form action="{{ route('courses.index') }}" method="GET" class="flex items-center space-x-2">
+            <x-text-input id="search" name="search" type="text" class="block" placeholder="Search courses..." value="{{ $search }}" />
+            <x-primary-button type="submit">Search</x-primary-button>
+            @if($search)
+                <a href="{{ route('courses.index') }}" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 focus:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    Clear
+                </a>
+            @endif
+        </form>
         <a href="{{ route('courses.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
             Add New Course
         </a>
@@ -33,7 +42,7 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                @foreach ($courses as $course)
+                @forelse ($courses as $course)
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                             {{ $course->id }}
@@ -57,8 +66,18 @@
                             </form>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-center">
+                            No courses found.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
+    </div>
+
+    <div class="mt-4">
+        {{ $courses->links() }}
     </div>
 </x-app-layout>

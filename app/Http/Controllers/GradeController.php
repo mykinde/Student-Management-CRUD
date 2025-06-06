@@ -9,11 +9,61 @@ use Illuminate\Http\Request;
 
 class GradeController extends Controller
 {
-    public function index()
+    public function index1()
     {
         $grades = Grade::with(['student', 'course'])->get();
         return view('grades.index', compact('grades'));
     }
+
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+        $filterCourseId = $request->input('filter_course_id');
+        $filterGrade = $request->input('filter_grade');
+
+        // Get all courses and distinct grades for filter dropdowns
+        $courses = Course::all();
+        // For distinct grades, we can fetch them from the grades table directly or define a set of common grades.
+        // Let's assume common grades for now, or fetch distinct ones from existing grades if there are many variations.
+        // For a more robust solution, consider a dedicated 'GradeType' model or enum if grades are fixed.
+        // For simplicity, let's get distinct grades that are currently assigned.
+        $distinctGrades = Grade::select('grade')->distinct()->pluck('grade')->sort()->toArray();
+
+        $grades = Grade::query()
+            ->with(['student', 'course']) // Eager load relationships for efficient querying and display
+
+            // Apply search functionality
+            ->when($search, function ($query, $search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('grade', 'like', '%' . $search . '%') // Search by grade value
+                             ->orWhereHas('student', function ($studentQuery) use ($search) {
+                                 $studentQuery->where('first_name', 'like', '%' . $search . '%')
+                                              ->orWhere('last_name', 'like', '%' . $search . '%');
+                             })
+                             ->orWhereHas('course', function ($courseQuery) use ($search) {
+                                 $courseQuery->where('name', 'like', '%' . $search . '%')
+                                             ->orWhere('code', 'like', '%' . $search . '%');
+                             });
+                });
+            })
+
+            // Apply filter by course
+            ->when($filterCourseId, function ($query, $filterCourseId) {
+                $query->where('course_id', $filterCourseId);
+            })
+
+            // Apply filter by grade
+            ->when($filterGrade, function ($query, $filterGrade) {
+                $query->where('grade', $filterGrade);
+            })
+
+            ->latest() // Order by latest created grades
+            ->paginate(10); // Paginate results
+
+        return view('grades.index', compact('grades', 'courses', 'distinctGrades', 'search', 'filterCourseId', 'filterGrade'));
+    }
+
+    
 
     public function create()
     {

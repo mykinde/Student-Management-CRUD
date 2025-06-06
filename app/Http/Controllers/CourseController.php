@@ -7,10 +7,26 @@ use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
-    public function index()
+    public function index1()
     {
         $courses = Course::all();
         return view('courses.index', compact('courses'));
+    }
+
+      public function index(Request $request)
+    {
+        $search = $request->input('search');
+
+        $courses = Course::query()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('code', 'like', '%' . $search . '%')
+                      ->orWhere('description', 'like', '%' . $search . '%');
+            })
+            ->latest() // Order by latest created courses
+            ->paginate(10); // Add pagination
+
+        return view('courses.index', compact('courses', 'search'));
     }
 
     public function create()
