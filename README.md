@@ -1,6 +1,13 @@
 # 🎓 Student Management System (Laravel 12)
 
 A simple Laravel 12-based web application for managing students, courses, and grades with built-in authentication.
+## About Repository
+
+A very simple Laravel 12 +  Application.
+
+<p align="center">
+<img src="https://i.imgur.com/W2REBdh.png">
+</p>
 
 ---
 
@@ -75,19 +82,16 @@ routes/
 
 
 
-## About Repository
 
-A very simple Laravel 12 +  Application.
-<p align="center">
-<img src="https://i.imgur.com/zX9aMWO.png">
-
-</p>
 
 ## mykinde
 for full package and demo contact g3send@gmail.com
 
 ## Credit
-This repository is motivated by [mykinde/laravStart](https://github.com/mykinde/laravel_12_chatgpt_app.git) and his awesome video tutorial in [Youtube](https://www.youtube.com/watch?v=ubSWfJ4Gqy8).
+This repository is motivated by [mykinde/laravStart](https://github.com/mykinde/laravel_12_chatgpt_app.git) 
+
+and his awesome video tutorial in [Youtube](https://www.youtube.com/watch?v=ubSWfJ4Gqy8).
+
 https://gemini.google.com/app/cc1dd82531cd6999
 
 ## License
