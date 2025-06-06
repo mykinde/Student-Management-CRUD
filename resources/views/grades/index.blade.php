@@ -5,6 +5,8 @@
         </h2>
     </x-slot>
 
+    
+
     <div class="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
         {{-- Search and Filter Form --}}
         <form action="{{ route('grades.index') }}" method="GET" class="w-full md:w-auto flex flex-col md:flex-row items-stretch md:items-center space-y-2 md:space-y-0 md:space-x-2">
@@ -28,11 +30,15 @@
                 @endforeach
             </select>
 
+            {{-- Hidden fields for current sorting to preserve it when other filters are applied --}}
+            <input type="hidden" name="sort_by" value="{{ $sortBy }}">
+            <input type="hidden" name="sort_direction" value="{{ $sortDirection }}">
+
             <x-primary-button type="submit">Apply</x-primary-button>
 
-            @if($search || $filterCourseId || $filterGrade)
+            @if($search || $filterCourseId || $filterGrade || $sortBy != 'created_at' || $sortDirection != 'desc')
                 <a href="{{ route('grades.index') }}" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 focus:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150 w-full md:w-auto justify-center">
-                    Clear Filters
+                    Clear All
                 </a>
             @endif
         </form>
@@ -57,7 +63,16 @@
                         Course
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Grade
+                        <a href="{{ route('grades.index', array_merge(request()->query(), ['sort_by' => 'grade', 'sort_direction' => ($sortBy === 'grade' && $sortDirection === 'asc' ? 'desc' : 'asc')])) }}" class="flex items-center">
+                            Grade
+                            @if ($sortBy === 'grade')
+                                @if ($sortDirection === 'asc')
+                                    <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                                @else
+                                    <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                @endif
+                            @endif
+                        </a>
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Actions
